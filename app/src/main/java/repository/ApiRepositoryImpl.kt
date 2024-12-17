@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.res.Resources
 import com.example.myapplicationtest.R
 import remote.ZooApi
-import service.MyService
+//import service.MyService
 import service.ZooService
 import javax.inject.Inject
 
@@ -18,10 +18,11 @@ class ApiRepositoryImpl @Inject constructor(
         val appName = appContext.getString(R.string.app_name)
     }
 
-    override suspend fun networkCall(): List<String> {
+    override suspend fun networkCall(): String {
 //        api.networkCall()
 //        return emptyList<String>()
-        return MyService().repository.networkCall()
+//        return MyService().repository.networkCall()
+        return zooService.getZooOpenData()
     }
 
     override suspend fun getZooData(): String {

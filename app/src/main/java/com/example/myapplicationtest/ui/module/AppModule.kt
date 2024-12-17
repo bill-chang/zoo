@@ -19,7 +19,7 @@ import javax.inject.Singleton
 object AppModule {
 
     @Provides
-    @Singleton
+//    @Singleton
     fun provideZooApi(): ZooApi{
      return Retrofit.Builder()
          .baseUrl("https://data.taipei/#/dataset/detail?id=1ed45a8a-d26a-4a5f-b544-788a4071eea2")
@@ -34,7 +34,7 @@ object AppModule {
 //    }
 
     @Provides
-    @Singleton
+//    @Singleton
     fun provideRepository(api: ZooApi, appContext: Application, zooService: ZooService): ApiRepository {
         return ApiRepositoryImpl(appContext, zooService)
     }
