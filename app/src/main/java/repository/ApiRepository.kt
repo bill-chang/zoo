@@ -1,13 +1,10 @@
 package repository
 
-import android.content.res.Resources
+import Data.ZooResult
 
 interface ApiRepository {
-    suspend fun networkCall() : String {
-        return ""
-    }
 
-    suspend fun getZooData():String{
-        return ""
-    }
+    suspend fun networkCall(searchOption: String) : ZooResult
+
+    suspend fun getZooData(): String
 }
