@@ -1,13 +1,19 @@
 package module
 
-
+//import dagger.Binds
+//import dagger.Module
+//import dagger.hilt.InstallIn
+//import dagger.hilt.components.SingletonComponent
+//import repository.ApiRepository
+//import repository.ApiRepositoryImpl
+//import javax.inject.Singleton
+//
 //@Module
-//@InstallIn(ViewModelComponent::class)
+//@InstallIn(SingletonComponent::class)
 //abstract class RepositoryModule {
 //
 //    @Binds
-////    @Singleton
-//    abstract fun bindMyRepository(
-//        myRepositoryImpl: ApiRepositoryImpl
-//    ): ApiRepository
+//    @Singleton
+//    abstract fun bindApiRepository(impl: ApiRepositoryImpl): ApiRepository
+//
 //}

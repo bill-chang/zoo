@@ -1,5 +1,6 @@
 package repository
 
+import Data.Posts
 import Data.ZooBody
 import Data.ZooParams
 import Data.ZooResult
@@ -17,7 +18,7 @@ import service.ZooService
 import timber.log.Timber
 import javax.inject.Inject
 
-class ApiRepositoryImpl(
+class ApiRepositoryImpl @Inject constructor(
 //    private val api: ZooApi,
     private val appContext: Application,
     private val zooService: ZooService,
@@ -27,17 +28,25 @@ class ApiRepositoryImpl(
         val appName = appContext.getString(R.string.app_name)
     }
 
-    override suspend fun networkCall(searchOption: String): ZooResult {
-//        api.networkCall()
-//        return emptyList<String>()
-//        return MyService().repository.networkCall()
-        return zooService.getZooLibrary(ZooParams(scope = searchOption)).apply {
-            Log.d("34_789", "networkCall: $this")
-        }
+//    override suspend fun networkCall(): ZooResult {
+    override suspend fun networkCall(): List<Posts> {
+//    override suspend fun networkCall(searchOption: String): ZooResult {
+//        return zooService.getZooLibrary(ZooParams(scope = searchOption)).apply {
+        return zooService.getZooLibrary().map {
+//            Log.d("34_789", "networkCall: $this")
+            Posts(
+                userId = it.userId,
+                id = it.id,
+                title = it.title,
+                body = it.body
+            )
+        }?: emptyList()
+//        return ZooResult()
     }
 
     override suspend fun getZooData(): String {
-        return zooService.getZooOpenData(ZooBody(ddd = ""))
+//        return zooService.getZooOpenData(ZooBody(ddd = ""))
+        return ""
     }
 }
 

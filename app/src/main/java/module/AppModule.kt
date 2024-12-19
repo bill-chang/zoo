@@ -13,6 +13,7 @@ import remote.ZooApi
 import repository.ApiRepository
 import repository.ApiRepositoryImpl
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import service.ZooService
 import javax.inject.Singleton
 //
@@ -20,21 +21,17 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 //
-////    @Provides
-////    @Singleton
-////    fun provideZooApi(): ZooApi{
-////     return Retrofit.Builder()
-////         .baseUrl("https://data.taipei/#/dataset/detail?id=1ed45a8a-d26a-4a5f-b544-788a4071eea2")
-////         .build()
-////         .create(ZooApi::class.java)
-////    }
-//
-////    @Provides
-////    @Singleton
-////    fun provideRepository(api: ZooApi, appContext: Application): ApiRepository {
-////        return ApiRepositoryImpl(api, appContext)
-////    }
-//
+    @Provides
+    @Singleton
+    fun provideZooService(): ZooService{
+     return Retrofit.Builder()
+//         .baseUrl("https://data.taipei/#/dataset/detail?id=1ed45a8a-d26a-4a5f-b544-788a4071eea2")
+         .baseUrl("https://jsonplaceholder.typicode.com")
+         .addConverterFactory(GsonConverterFactory.create())
+         .build()
+         .create(ZooService::class.java)
+    }
+
     @Provides
     @Singleton
     fun provideRepository(
@@ -43,4 +40,5 @@ object AppModule {
     ): ApiRepository {
         return ApiRepositoryImpl(appContext, zooService)
     }
+
 }

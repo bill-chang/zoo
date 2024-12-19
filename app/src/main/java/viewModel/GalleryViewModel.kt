@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GalleryViewModel @Inject constructor(
-//    private val repository: Lazy<ApiRepository>
+    private val repository: ApiRepository
 ) : ViewModel() {
 
     init {

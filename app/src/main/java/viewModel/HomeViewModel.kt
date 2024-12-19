@@ -1,22 +1,30 @@
 package viewModel
 
+import Data.Posts
+import Data.ZooResultData
+import Data.ZooResultItem
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import remote.ZooApi
 import repository.ApiRepository
 import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-//    private val repository: ApiRepository
+    private val repository: ApiRepository
 ): ViewModel() {
 
     init {
         getData()
-//        repository.networkCall("resourceAquire")
     }
 
     private val _text = MutableLiveData<String>().apply {
@@ -24,8 +32,17 @@ class HomeViewModel @Inject constructor(
     }
     val text: LiveData<String> = _text
 
-    fun getData(){
+//    private val _zooLibraryData = MutableSharedFlow<List<ZooResultItem>>()
+//    val zooLibraryData: SharedFlow<List<ZooResultItem>> = _zooLibraryData.asSharedFlow()
+
+    private val _zooLibraryData = MutableStateFlow<List<Posts>>(emptyList())
+    val zooLibraryData: SharedFlow<List<Posts>> = _zooLibraryData.asStateFlow()
+
+    private fun getData(){
         viewModelScope.launch {
+            val ddd = repository.networkCall()
+            _zooLibraryData.tryEmit(ddd)
+            Log.d("30_789", "getData: $ddd")
 //            repository.networkCall("resourceAquire")
         }
     }

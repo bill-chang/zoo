@@ -64,7 +64,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation("androidx.compose.runtime:runtime")
-    api(platform("androidx.compose:compose-bom:2024.06.00"))
+    api(platform("androidx.compose:compose-bom:2024.12.01"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:2.0.10-RC"))
     implementation("com.google.dagger:hilt-android:2.51.1")
     ksp("com.google.dagger:hilt-android-compiler:2.51.1")
@@ -80,5 +80,16 @@ dependencies {
 
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+
+
+    // other dependencies
+    // Compose
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.compose.material3:material3")
+    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.28.0")
+
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
 
 }
