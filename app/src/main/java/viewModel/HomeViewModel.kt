@@ -1,5 +1,6 @@
 package viewModel
 
+import Data.AnimalResultItem
 import Data.Posts
 import Data.ZooResultData
 import Data.ZooResultItem
@@ -32,15 +33,17 @@ class HomeViewModel @Inject constructor(
     }
     val text: LiveData<String> = _text
 
-//    private val _zooLibraryData = MutableSharedFlow<List<ZooResultItem>>()
-//    val zooLibraryData: SharedFlow<List<ZooResultItem>> = _zooLibraryData.asSharedFlow()
+    private val _zooLibraryData = MutableStateFlow<List<ZooResultItem>>(emptyList())
+    val zooLibraryData: SharedFlow<List<ZooResultItem>> = _zooLibraryData.asStateFlow()
 
-    private val _zooLibraryData = MutableStateFlow<List<Posts>>(emptyList())
-    val zooLibraryData: SharedFlow<List<Posts>> = _zooLibraryData.asStateFlow()
+
+
+//    private val _zooLibraryData = MutableStateFlow<List<Posts>>(emptyList())
+//    val zooLibraryData: SharedFlow<List<Posts>> = _zooLibraryData.asStateFlow()
 
     private fun getData(){
         viewModelScope.launch {
-            val ddd = repository.networkCall()
+            val ddd = repository.networkCall().result?.results.orEmpty()
             _zooLibraryData.tryEmit(ddd)
             Log.d("30_789", "getData: $ddd")
 //            repository.networkCall("resourceAquire")

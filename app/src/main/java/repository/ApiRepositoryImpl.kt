@@ -1,7 +1,7 @@
 package repository
 
 import Data.Posts
-import Data.ZooBody
+import Data.ZooAnimalResult
 import Data.ZooParams
 import Data.ZooResult
 import android.app.Application
@@ -28,25 +28,16 @@ class ApiRepositoryImpl @Inject constructor(
         val appName = appContext.getString(R.string.app_name)
     }
 
-//    override suspend fun networkCall(): ZooResult {
-    override suspend fun networkCall(): List<Posts> {
-//    override suspend fun networkCall(searchOption: String): ZooResult {
-//        return zooService.getZooLibrary(ZooParams(scope = searchOption)).apply {
-        return zooService.getZooLibrary().map {
-//            Log.d("34_789", "networkCall: $this")
-            Posts(
-                userId = it.userId,
-                id = it.id,
-                title = it.title,
-                body = it.body
-            )
-        }?: emptyList()
-//        return ZooResult()
+    override suspend fun networkCall(): ZooResult {
+        return zooService.getZooLibrary("resourceAquire").apply {
+            Log.d("34_789", "networkCall: $this")
+        }
     }
 
-    override suspend fun getZooData(): String {
-//        return zooService.getZooOpenData(ZooBody(ddd = ""))
-        return ""
+    override suspend fun getZooData(): ZooAnimalResult {
+        return zooService.getZooAnimalData("resourceAquire").apply {
+                Log.d("39_789", "networkCall: $this")
+            }
     }
 }
 

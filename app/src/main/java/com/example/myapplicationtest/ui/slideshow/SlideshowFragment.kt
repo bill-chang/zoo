@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplicationtest.databinding.FragmentSlideshowBinding
 import dagger.hilt.android.AndroidEntryPoint
+import viewModel.HomeViewModel
 import viewModel.SlideshowViewModel
 
 @AndroidEntryPoint
@@ -20,16 +21,16 @@ class SlideshowFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private val slideshowViewModel by viewModels<SlideshowViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        val slideshowViewModel =
-//            ViewModelProvider(this).get(SlideshowViewModel::class.java)
 
-        val slideshowViewModel: SlideshowViewModel by viewModels()
+
+//        val slideshowViewModel: SlideshowViewModel by viewModels()
 
         _binding = FragmentSlideshowBinding.inflate(inflater, container, false)
         val root: View = binding.root

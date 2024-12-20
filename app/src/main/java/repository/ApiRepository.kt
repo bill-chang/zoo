@@ -1,13 +1,12 @@
 package repository
 
 import Data.Posts
+import Data.ZooAnimalResult
 import Data.ZooResult
 
 interface ApiRepository {
 
-//    suspend fun networkCall(searchOption: String) : ZooResult
-//    suspend fun networkCall() : ZooResult
-    suspend fun networkCall() : List<Posts>
+    suspend fun networkCall() : ZooResult
 
-    suspend fun getZooData(): String
+    suspend fun getZooData(): ZooAnimalResult
 }

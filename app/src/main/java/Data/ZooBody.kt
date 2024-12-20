@@ -5,13 +5,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ZooBody(
-    val ddd: String,
-)
-
-@Serializable
 data class ZooResult(
-    val result: ZooResultData = ZooResultData()
+    val result: ZooResultData ?= ZooResultData()
 )
 
 @Serializable
@@ -20,29 +15,39 @@ data class ZooResultData(
     val offset: Int = 0,
     val count: Int = 0,
     val sort: String? = "",
-    val results: List<ZooResultItem> = emptyList()
+    val results: List<ZooResultItem> ?= emptyList()
 )
 
 @Serializable
 data class ZooResultItem(
-    @SerialName("_id")
+    @SerializedName("_id")
     val id: String ?= "",
-    @SerialName("e_no")
+    @SerializedName("_importdate")
+    val importDate: DateInfoList,
+    @SerializedName("e_no")
     val eNo: String ?= "",
-    @SerialName("e_category")
+    @SerializedName("e_category")
     val eCategory: String ?= "",
-    @SerialName("e_name")
+    @SerializedName("e_name")
     val eName: String ?= "",
-    @SerialName("e_pic_url")
+    @SerializedName("e_pic_url")
     val ePicUrl: String ?= "",
-    @SerialName("e_info")
+    @SerializedName("e_info")
     val eInfo: String ?= "",
-    @SerialName("e_memo")
+    @SerializedName("e_memo")
     val eMemo: String ?= "",
-    @SerialName("e_geo")
+    @SerializedName("e_geo")
     val eGeo: String ?= "",
-    @SerialName("e_url")
+    @SerializedName("e_url")
     val eUrl: String ?= "",
+)
+
+@Serializable
+data class DateInfoList(
+    val date: String ?= "",
+    @SerializedName("timezone_type")
+    val timeZoneType: String ?= "",
+    val timeZone: String ?= "",
 )
 
 @Serializable
