@@ -24,7 +24,7 @@ data class AnimalResultItem(
     @SerializedName("_importdate")
     val importDate: DateInfoList ?= DateInfoList(),
     @SerializedName("a_name_ch")
-    val animalId: String ?= "",
+    val aNameCh: String ?= "",
     @SerializedName("a_summary")
     val animalKind: String ?= "",
     @SerializedName("a_keywords")

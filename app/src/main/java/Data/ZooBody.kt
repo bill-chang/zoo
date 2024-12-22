@@ -23,7 +23,7 @@ data class ZooResultItem(
     @SerializedName("_id")
     val id: String ?= "",
     @SerializedName("_importdate")
-    val importDate: DateInfoList,
+    val importDate: DateInfoList ?= DateInfoList(),
     @SerializedName("e_no")
     val eNo: String ?= "",
     @SerializedName("e_category")

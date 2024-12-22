@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
@@ -205,15 +206,16 @@ fun LibraryContent(modifier: Modifier, item: ZooResultItem) {
 }
 
 @Composable
-fun ItemEndView(modifier: Modifier) {
+fun ItemEndView(modifier: Modifier, imageSize: Dp = 30.dp,)  {
     Box (
         modifier = modifier,
         contentAlignment = Alignment.Center
     ){
         AsyncImage(
             modifier = Modifier
-                .size(30.dp)
-                .background(color = Color.Blue),
+                .size(imageSize)
+//                .background(color = Color.Blue)
+            ,
             model = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6KeNeMElIyuUJp-nGg8hx3MSuUU6duDbCCQ&s",
             contentDescription = "",
             error = painterResource(R.drawable.ic_launcher_foreground),
