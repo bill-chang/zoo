@@ -5,11 +5,18 @@ import Data.AnimalResultItem
 import Data.ZooResultItem
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,8 +32,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -40,6 +49,12 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
+import androidx.navigation.navArgs
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.imageLoader
@@ -69,6 +84,7 @@ class GalleryFragment : Fragment() {
     ): View {
         // 要處理第一個動物園葉面帶過來的資料
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
+//        val ddd =
         val root: View = binding.root
 
         val textView: TextView = binding.textGallery
@@ -79,7 +95,12 @@ class GalleryFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                LibraryMainView(viewModel = galleryViewModel)
+                LibraryMainView(viewModel = galleryViewModel){ it ->
+                   val controller = requireActivity().findNavController(R.id.nav_host_fragment_content_main)
+                    controller.currentBackStackEntry?.savedStateHandle?.set("Title", it)
+                    Log.d("52_789", "onCreateView: $it")
+                    controller.navigate(R.id.nav_slideshow)
+                }
             }
         }
     }
@@ -95,6 +116,7 @@ fun LibraryMainView(
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
     viewModel: GalleryViewModel,
+    onClickListener: (String) -> Unit,
 ) {
     val imageLoader = context.imageLoader.newBuilder()
         .logger(DebugLogger())
@@ -111,13 +133,23 @@ fun LibraryMainView(
             mainLibraryData = ZooResultItem(),
             imageLoader = imageLoader,
         )
-        HorizontalDivider(thickness = 10.dp, color = Color.Gray)
-        AnimalIntroduceColumn(modifier = Modifier.padding(5.dp), libraryData = libraryData, context = context, imageLoader = imageLoader)
+        HorizontalDivider(thickness = 10.dp, color = Color.LightGray)
+        AnimalIntroduceColumn(modifier = Modifier.padding(5.dp), libraryData = libraryData, context = context, imageLoader = imageLoader, onClickListener = onClickListener)
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AnimalIntroduceColumn(modifier: Modifier = Modifier, libraryData: List<AnimalResultItem>,context: Context,imageLoader: ImageLoader) {
+fun AnimalIntroduceColumn(
+    modifier: Modifier = Modifier,
+    libraryData: List<AnimalResultItem>,
+    context: Context,imageLoader: ImageLoader,
+    onClickListener: (String)-> Unit
+) {
+//    val navController = rememberNavController()
+//    navController
+//    navController.navigate(R.id.nav_slideshow)
+//    val currentBackStack by navController.currentBackStackEntryAsState()
     Column {
         ViewTitle(
             modifier = Modifier
@@ -125,16 +157,21 @@ fun AnimalIntroduceColumn(modifier: Modifier = Modifier, libraryData: List<Anima
                 .height(40.dp)
                 .padding(start = 5.dp, top = 5.dp, bottom = 5.dp)
         )
-        AnimalInfoColumn(modifier = Modifier.fillMaxSize(), animalResultData = libraryData, context = context, imageLoader = imageLoader)
+        AnimalInfoColumn(modifier = Modifier.fillMaxSize(
+//            onClick = {navController.navigate(R.id.nav_slideshow)}
+        ), animalResultData = libraryData, context = context, imageLoader = imageLoader, onClickListener = onClickListener)
     }
+//    NavHost()
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnimalInfoColumn(
     modifier: Modifier,
     animalResultData: List<AnimalResultItem>,
     context: Context,
-    imageLoader: ImageLoader
+    imageLoader: ImageLoader,
+    onClickListener: (String) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         itemsIndexed(animalResultData) { index, item ->
@@ -142,14 +179,17 @@ fun AnimalInfoColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
-                    .padding(5.dp),
+                    .padding(5.dp)
+                    .combinedClickable(
+                        onClick = { onClickListener(item.aNameCh.orEmpty()) }
+                    ),
                 context = context,
                 imgUrl =  item.aPic01Url.orEmpty(),
                 imageLoader = imageLoader,
                 title = item.aNameCh.orEmpty(),
                 content = item.aFeature.orEmpty()
             )
-            if (index!=animalResultData.lastIndex) HorizontalDivider(thickness = 2.dp, color = Color.Gray)
+            if (index!=animalResultData.lastIndex) HorizontalDivider(thickness = 2.dp, color = Color.LightGray)
         }
     }
 }
@@ -167,7 +207,8 @@ fun AnimalItem(
         AsyncImage(
             modifier = Modifier
                 .width(100.dp)
-                .fillMaxHeight(),
+                .fillMaxHeight()
+                .background(Color.Blue),
             model = ImageRequest.Builder(context)
                 .data(imgUrl)
                 .setHeader("User-Agent", "Mozilla/5.0")
@@ -193,14 +234,12 @@ fun AnimalItem(
 @Composable
 fun AnimalContent(modifier: Modifier = Modifier, title: String, content: String) {
     Column(modifier = modifier) {
-        Text(
+        MiddleTextView(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp),
-            text = title,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = TextStyle(fontSize = 20.sp)
+            alignment = Alignment.CenterStart,
+            content = title,
         )
         Text(
             modifier = Modifier
@@ -325,6 +364,29 @@ fun BottomInfoLine(
                 .fillMaxSize(),
             text = "在網頁開啟",
             style = TextStyle(fontSize = 20.sp, textAlign = TextAlign.End)
+        )
+    }
+}
+
+@Composable
+fun MiddleTextView(
+    modifier: Modifier = Modifier,
+    content: String,
+    alignment: Alignment,
+    ) {
+    Box(
+//        Modifier
+//            .fillMaxWidth()
+//            .height(40.dp),
+//        contentAlignment = Alignment.CenterStart
+        modifier = modifier,
+        contentAlignment = alignment
+    ){
+        Text(
+            text = content,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = TextStyle(fontSize = 20.sp)
         )
     }
 }
