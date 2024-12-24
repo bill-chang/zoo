@@ -1,7 +1,6 @@
 package viewModel
 
 import Data.AnimalResultItem
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -19,7 +18,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SlideshowViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val repository: ApiRepository,
 ): ViewModel() {
 
@@ -32,11 +30,6 @@ class SlideshowViewModel @Inject constructor(
     init {
         getData1()
     }
-
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is slideshow Fragment"
-    }
-    val text: LiveData<String> = _text
 
     private fun getData1(){
         viewModelScope.launch {

@@ -17,18 +17,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val repository: ApiRepository,
 ): ViewModel() {
 
     init {
         getData()
     }
-
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
-    }
-    val text: LiveData<String> = _text
 
     private val _zooLibraryData = MutableStateFlow<List<ZooResultItem>>(emptyList())
     val zooLibraryData: SharedFlow<List<ZooResultItem>> = _zooLibraryData.asStateFlow()

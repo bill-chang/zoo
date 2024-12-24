@@ -18,24 +18,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GalleryViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val repository: ApiRepository
 ) : ViewModel() {
 
     private val _zooAnimalDataList = MutableStateFlow<List<AnimalResultItem>>(emptyList())
     val zooAnimalDataList: SharedFlow<List<AnimalResultItem>> = _zooAnimalDataList.asStateFlow()
 
-    private val _zooAnimalsData3 = MutableStateFlow<ZooResultItem>(ZooResultItem())
+    private val _zooAnimalsData3 = MutableStateFlow(ZooResultItem())
     val zooAnimalsData3: SharedFlow<ZooResultItem> = _zooAnimalsData3.asStateFlow()
 
     init {
         getData1()
     }
-
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is gallery Fragment"
-    }
-    val text: LiveData<String> = _text
 
     private fun getData1(){
         viewModelScope.launch {
