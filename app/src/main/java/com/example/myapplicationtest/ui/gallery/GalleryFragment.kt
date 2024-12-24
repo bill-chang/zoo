@@ -1,21 +1,15 @@
 package com.example.myapplicationtest.ui.gallery
 
-import Data.AnimalResultData
 import Data.AnimalResultItem
 import Data.ZooResultItem
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnClickListener
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,30 +25,31 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.navArgs
-import androidx.navigation.navArgs
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.imageLoader
@@ -76,29 +71,30 @@ class GalleryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private val galleryViewModel by viewModels<GalleryViewModel>()
+//    private val GalleryFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         // 要處理第一個動物園葉面帶過來的資料
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
-//        val ddd =
-        val root: View = binding.root
+//        val root: View = binding.root
 
-        val textView: TextView = binding.textGallery
-        galleryViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
-//        return root
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            val controller =
+                requireActivity().findNavController(R.id.nav_host_fragment_content_main)
             setContent {
-                LibraryMainView(viewModel = galleryViewModel){ it ->
-                   val controller = requireActivity().findNavController(R.id.nav_host_fragment_content_main)
-                    controller.currentBackStackEntry?.savedStateHandle?.set("Title", it)
-                    Log.d("52_789", "onCreateView: $it")
+                LibraryMainView(
+                    viewModel = galleryViewModel,
+                    navController = controller
+                ) { it ->
+                    galleryViewModel.saveArgs(
+                        controller,
+                        titleCh = it.aNameCh.orEmpty(),
+                    )
                     controller.navigate(R.id.nav_slideshow)
                 }
             }
@@ -113,43 +109,48 @@ class GalleryFragment : Fragment() {
 
 @Composable
 fun LibraryMainView(
-    modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
     viewModel: GalleryViewModel,
-    onClickListener: (String) -> Unit,
+    navController: NavController,
+    onClickListener: (AnimalResultItem) -> Unit,
 ) {
+    val libraryData by viewModel.zooAnimalDataList.collectAsStateWithLifecycle(emptyList())
+    val animalData3 by viewModel.zooAnimalsData3.collectAsStateWithLifecycle(ZooResultItem())
+
     val imageLoader = context.imageLoader.newBuilder()
         .logger(DebugLogger())
         .memoryCache { MemoryCache.Builder(context).maxSizePercent(0.1).build() }
         .build()
 
+    LaunchedEffect(libraryData) {
+        viewModel.getArgs(navController)
+    }
+
     Column {
-        val libraryData by viewModel.zooLibraryData1.collectAsStateWithLifecycle(emptyList())
         LibraryIntroduceView(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(400.dp),
             context = context,
-            mainLibraryData = ZooResultItem(),
+            mainLibraryData = animalData3,
             imageLoader = imageLoader,
         )
         HorizontalDivider(thickness = 10.dp, color = Color.LightGray)
-        AnimalIntroduceColumn(modifier = Modifier.padding(5.dp), libraryData = libraryData, context = context, imageLoader = imageLoader, onClickListener = onClickListener)
+        AnimalIntroduceColumn(
+            libraryData = libraryData,
+            context = context,
+            imageLoader = imageLoader,
+            onClickListener = onClickListener
+        )
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnimalIntroduceColumn(
-    modifier: Modifier = Modifier,
     libraryData: List<AnimalResultItem>,
-    context: Context,imageLoader: ImageLoader,
-    onClickListener: (String)-> Unit
+    context: Context, imageLoader: ImageLoader,
+    onClickListener: (AnimalResultItem) -> Unit,
 ) {
-//    val navController = rememberNavController()
-//    navController
-//    navController.navigate(R.id.nav_slideshow)
-//    val currentBackStack by navController.currentBackStackEntryAsState()
     Column {
         ViewTitle(
             modifier = Modifier
@@ -157,9 +158,13 @@ fun AnimalIntroduceColumn(
                 .height(40.dp)
                 .padding(start = 5.dp, top = 5.dp, bottom = 5.dp)
         )
-        AnimalInfoColumn(modifier = Modifier.fillMaxSize(
-//            onClick = {navController.navigate(R.id.nav_slideshow)}
-        ), animalResultData = libraryData, context = context, imageLoader = imageLoader, onClickListener = onClickListener)
+        AnimalInfoColumn(
+            modifier = Modifier.fillMaxSize(),
+            animalResultData = libraryData,
+            context = context,
+            imageLoader = imageLoader,
+            onClickListener = onClickListener
+        )
     }
 //    NavHost()
 }
@@ -171,7 +176,7 @@ fun AnimalInfoColumn(
     animalResultData: List<AnimalResultItem>,
     context: Context,
     imageLoader: ImageLoader,
-    onClickListener: (String) -> Unit,
+    onClickListener: (AnimalResultItem) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         itemsIndexed(animalResultData) { index, item ->
@@ -181,15 +186,18 @@ fun AnimalInfoColumn(
                     .height(120.dp)
                     .padding(5.dp)
                     .combinedClickable(
-                        onClick = { onClickListener(item.aNameCh.orEmpty()) }
+                        onClick = { onClickListener(item) }
                     ),
                 context = context,
-                imgUrl =  item.aPic01Url.orEmpty(),
+                imgUrl = item.aPic01Url.orEmpty(),
                 imageLoader = imageLoader,
                 title = item.aNameCh.orEmpty(),
                 content = item.aFeature.orEmpty()
             )
-            if (index!=animalResultData.lastIndex) HorizontalDivider(thickness = 2.dp, color = Color.LightGray)
+            if (index != animalResultData.lastIndex) HorizontalDivider(
+                thickness = 2.dp,
+                color = Color.LightGray
+            )
         }
     }
 }
@@ -215,7 +223,7 @@ fun AnimalItem(
                 .crossfade(true)
                 .build(),
             imageLoader = imageLoader,
-            contentDescription = "",
+            contentDescription = "AnimalImage",
             contentScale = ContentScale.Fit,
             placeholder = painterResource(R.drawable.ic_menu_gallery),
             error = painterResource(R.drawable.ic_launcher_foreground),
@@ -276,10 +284,9 @@ fun LibraryIntroduceView(
 
 @Composable
 fun LibraryImage(
-    modifier: Modifier = Modifier,
     context: Context,
     mainLibraryData: ZooResultItem,
-    imageLoader: ImageLoader
+    imageLoader: ImageLoader,
 ) {
     AsyncImage(
         modifier = Modifier
@@ -287,12 +294,11 @@ fun LibraryImage(
             .height(200.dp),
         model = ImageRequest.Builder(context)
             .data("${mainLibraryData.ePicUrl}")
-            .size(270, 270)
             .setHeader("User-Agent", "Mozilla/5.0")
             .crossfade(true)
             .build(),
         imageLoader = imageLoader,
-        contentDescription = "",
+        contentDescription = "LibraryImage",
         contentScale = ContentScale.Fit,
         placeholder = painterResource(R.drawable.ic_menu_gallery),
         error = painterResource(R.drawable.ic_launcher_foreground),
@@ -309,60 +315,66 @@ fun LibraryDetailInfo(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp),
-//        text = item.eName.orEmpty(),
-            text = "123",
-//        maxLines = 1,
+            text = mainLibraryData.eInfo.orEmpty(),
             overflow = TextOverflow.Ellipsis,
             style = TextStyle(fontSize = 20.sp)
         )
-        BottomLibraryInfo(modifier = Modifier.fillMaxSize())
+        BottomLibraryInfo(mainLibraryData = mainLibraryData)
     }
 
 
 }
 
 @Composable
-fun BottomLibraryInfo(modifier: Modifier = Modifier) {
+fun BottomLibraryInfo(mainLibraryData: ZooResultItem) {
     Column {
-        TopInfoLine()
-        BottomInfoLine() {
-
-        }
+        TopInfoLine(mainLibraryData = mainLibraryData)
+        BottomInfoLine(
+            leftContent = mainLibraryData.eCategory ?: "無",
+            rightUrl = mainLibraryData.eUrl ?: ""
+        )
     }
 }
 
 @Composable
-fun TopInfoLine() {
-    Text(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp),
-        text = "123",
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        style = TextStyle(fontSize = 20.sp)
-    )
+fun TopInfoLine(mainLibraryData: ZooResultItem) {
+    mainLibraryData.eMemo?.ifBlank { "無" }?.let {
+        MiddleTextView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
+            content = it,
+            alignment = Alignment.CenterStart
+        )
+    }
 
 }
 
 @Composable
 fun BottomInfoLine(
-    modifier: Modifier = Modifier,
-    onClickListener: OnClickListener
+    leftContent: String = "",
+    rightUrl: String = "",
 ) {
     Row {
         Text(
             modifier = Modifier
                 .size(240.dp, 40.dp),
-            text = "123",
+            text = leftContent,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = TextStyle(fontSize = 20.sp)
         )
         Text(
+            buildAnnotatedString {
+                withLink(
+                    LinkAnnotation.Url(
+                        rightUrl,
+                        TextLinkStyles(style = SpanStyle(color = Color.Blue))
+                    )
+                ) { append("在網頁中開啟") }
+            },
             modifier = Modifier
                 .fillMaxSize(),
-            text = "在網頁開啟",
             style = TextStyle(fontSize = 20.sp, textAlign = TextAlign.End)
         )
     }
@@ -372,20 +384,17 @@ fun BottomInfoLine(
 fun MiddleTextView(
     modifier: Modifier = Modifier,
     content: String,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
     alignment: Alignment,
-    ) {
+) {
     Box(
-//        Modifier
-//            .fillMaxWidth()
-//            .height(40.dp),
-//        contentAlignment = Alignment.CenterStart
         modifier = modifier,
         contentAlignment = alignment
-    ){
+    ) {
         Text(
             text = content,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            overflow = overflow,
             style = TextStyle(fontSize = 20.sp)
         )
     }

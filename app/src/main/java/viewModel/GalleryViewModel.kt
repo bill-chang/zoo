@@ -2,18 +2,17 @@ package viewModel
 
 import Data.AnimalResultItem
 import Data.ZooResultItem
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import remote.ZooApi
 import repository.ApiRepository
 import javax.inject.Inject
 
@@ -23,14 +22,13 @@ class GalleryViewModel @Inject constructor(
     private val repository: ApiRepository
 ) : ViewModel() {
 
-    private val _zooLibraryData1 = MutableStateFlow<List<AnimalResultItem>>(emptyList())
-    val zooLibraryData1: SharedFlow<List<AnimalResultItem>> = _zooLibraryData1.asStateFlow()
+    private val _zooAnimalDataList = MutableStateFlow<List<AnimalResultItem>>(emptyList())
+    val zooAnimalDataList: SharedFlow<List<AnimalResultItem>> = _zooAnimalDataList.asStateFlow()
 
-    private val _zooAnimalsData2 = MutableStateFlow<List<ZooResultItem>>(emptyList())
-    val zooAnimalsData1: SharedFlow<List<ZooResultItem>> = _zooAnimalsData2.asStateFlow()
+    private val _zooAnimalsData3 = MutableStateFlow<ZooResultItem>(ZooResultItem())
+    val zooAnimalsData3: SharedFlow<ZooResultItem> = _zooAnimalsData3.asStateFlow()
 
     init {
-        getData()
         getData1()
     }
 
@@ -39,17 +37,28 @@ class GalleryViewModel @Inject constructor(
     }
     val text: LiveData<String> = _text
 
-    private fun getData(){
-        viewModelScope.launch {
-            _zooAnimalsData2.tryEmit(repository.networkCall().result?.results.orEmpty())
-        }
-    }
-
-
     private fun getData1(){
         viewModelScope.launch {
-            _zooLibraryData1.tryEmit(repository.getZooData().result?.results.orEmpty())
+            _zooAnimalDataList.tryEmit(repository.getZooData().result?.results.orEmpty())
         }
     }
 
+    fun saveArgs(
+        navController: NavController,
+        titleCh: String,
+    ) {
+        navController.currentBackStackEntry?.savedStateHandle?.set("titleCh", titleCh)
+    }
+
+    fun getArgs(navController: NavController){
+        val data = ZooResultItem(
+            eName = navController.previousBackStackEntry?.savedStateHandle?.get("title"),
+            ePicUrl = navController.previousBackStackEntry?.savedStateHandle?.get("imgUrl"),
+            eInfo = navController.previousBackStackEntry?.savedStateHandle?.get("libraryContent"),
+            eCategory = navController.previousBackStackEntry?.savedStateHandle?.get("category"),
+            eMemo = navController.previousBackStackEntry?.savedStateHandle?.get("memo"),
+            eUrl = navController.previousBackStackEntry?.savedStateHandle?.get("eUrl"),
+        )
+        _zooAnimalsData3.tryEmit(data)
+    }
 }

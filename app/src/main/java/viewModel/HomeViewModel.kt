@@ -1,29 +1,24 @@
 package viewModel
 
-import Data.AnimalResultItem
-import Data.Posts
-import Data.ZooResultData
 import Data.ZooResultItem
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import remote.ZooApi
 import repository.ApiRepository
 import javax.inject.Inject
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val repository: ApiRepository
+    private val repository: ApiRepository,
 ): ViewModel() {
 
     init {
@@ -38,18 +33,27 @@ class HomeViewModel @Inject constructor(
     private val _zooLibraryData = MutableStateFlow<List<ZooResultItem>>(emptyList())
     val zooLibraryData: SharedFlow<List<ZooResultItem>> = _zooLibraryData.asStateFlow()
 
-
-
-
-//    private val _zooLibraryData = MutableStateFlow<List<Posts>>(emptyList())
-//    val zooLibraryData: SharedFlow<List<Posts>> = _zooLibraryData.asStateFlow()
-
     private fun getData(){
         viewModelScope.launch {
-            val ddd = repository.networkCall().result?.results.orEmpty()
-            _zooLibraryData.tryEmit(ddd)
-            Log.d("30_789", "getData: $ddd")
-//            repository.networkCall("resourceAquire")
+            val libraryData = repository.networkCall().result?.results.orEmpty()
+            _zooLibraryData.tryEmit(libraryData)
         }
+    }
+
+    fun saveArgs(
+        navController: NavController,
+        title: String = "",
+        imgUrl: String = "",
+        libraryContent: String = "",
+        memo: String = "",
+        category: String = "",
+        eUrl: String = "",
+    ) {
+        navController.currentBackStackEntry?.savedStateHandle?.set("title", title)
+        navController.currentBackStackEntry?.savedStateHandle?.set("imgUrl", imgUrl)
+        navController.currentBackStackEntry?.savedStateHandle?.set("libraryContent", libraryContent)
+        navController.currentBackStackEntry?.savedStateHandle?.set("memo", memo)
+        navController.currentBackStackEntry?.savedStateHandle?.set("category", category)
+        navController.currentBackStackEntry?.savedStateHandle?.set("eUrl", eUrl)
     }
 }

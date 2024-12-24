@@ -1,6 +1,5 @@
 package repository
 
-import Data.Posts
 import Data.ZooAnimalResult
 import Data.ZooResult
 

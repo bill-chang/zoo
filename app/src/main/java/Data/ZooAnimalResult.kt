@@ -26,11 +26,11 @@ data class AnimalResultItem(
     @SerializedName("a_name_ch")
     val aNameCh: String ?= "",
     @SerializedName("a_summary")
-    val animalKind: String ?= "",
+    val aSummary: String ?= "",
     @SerializedName("a_keywords")
-    val animalSex: String ?= "",
+    val aKeyword: String ?= "",
     @SerializedName("a_alsoknown")
-    val animalAge: String ?= "",
+    val aAlsoKnown: String ?= "",
     @SerializedName("a_geo")
     val aGeo: String ?= "",
     @SerializedName("a_location")

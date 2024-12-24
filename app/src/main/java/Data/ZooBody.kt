@@ -1,7 +1,6 @@
 package Data
 
 import com.google.gson.annotations.SerializedName
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -48,16 +47,4 @@ data class DateInfoList(
     @SerializedName("timezone_type")
     val timeZoneType: String ?= "",
     val timeZone: String ?= "",
-)
-
-@Serializable
-data class Posts (
-//    @SerializedName("userId")
-    val userId: Int = 0,
-//    @SerializedName("id")
-    val id: Int = 0,
-//    @SerializedName("title")
-    val title: String? = null,
-//    @SerializedName("body")
-    val body: String? = null,
 )

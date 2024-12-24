@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import remote.ZooApi
 import repository.ApiRepository
 import javax.inject.Inject
 
@@ -24,15 +23,14 @@ class SlideshowViewModel @Inject constructor(
     private val repository: ApiRepository,
 ): ViewModel() {
 
-    private val _zooLibraryData1 = MutableStateFlow<List<AnimalResultItem>>(emptyList())
-    val zooLibraryData1: SharedFlow<List<AnimalResultItem>> = _zooLibraryData1.asStateFlow()
+    private val _animalDataList = MutableStateFlow<List<AnimalResultItem>>(emptyList())
+    val animalDataList: SharedFlow<List<AnimalResultItem>> = _animalDataList.asStateFlow()
 
-    private val _animalTitle = MutableStateFlow<String>("")
-    val animalTitle: SharedFlow<String> = _animalTitle.asStateFlow()
+    private val _animalDetailItem = MutableStateFlow<AnimalResultItem>(AnimalResultItem())
+    val animalDetailItem: SharedFlow<AnimalResultItem> = _animalDetailItem.asStateFlow()
 
     init {
         getData1()
-//        getPassData()
     }
 
     private val _text = MutableLiveData<String>().apply {
@@ -42,14 +40,17 @@ class SlideshowViewModel @Inject constructor(
 
     private fun getData1(){
         viewModelScope.launch {
-            val ddd = repository.getZooData().result?.results.orEmpty()
-            _zooLibraryData1.tryEmit(ddd)
-            Log.d("68_789", "getData2: $ddd")
+            _animalDataList.tryEmit(repository.getZooData().result?.results.orEmpty())
         }
     }
 
     fun getPassData(navController: NavController){
-        _animalTitle.tryEmit(navController.previousBackStackEntry?.savedStateHandle?.get<String>("Title").orEmpty())
-        Log.d("52_789", "getPassData: ${_animalTitle.value}")
+        _animalDetailItem.tryEmit(
+            _animalDataList.value.firstOrNull {
+                it.aNameCh == navController.previousBackStackEntry?.savedStateHandle?.get<String>(
+                    "titleCh"
+                ).orEmpty()
+            } ?: AnimalResultItem()
+        )
     }
 }
