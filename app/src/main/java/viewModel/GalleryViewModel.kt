@@ -2,9 +2,6 @@ package viewModel
 
 import Data.AnimalResultItem
 import Data.ZooResultItem
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
