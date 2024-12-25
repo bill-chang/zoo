@@ -1,7 +1,6 @@
 package viewModel
 
 import Data.AnimalResultItem
-import Data.ZooResultItem
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -21,9 +20,6 @@ class GalleryViewModel @Inject constructor(
     private val _zooAnimalDataList = MutableStateFlow<List<AnimalResultItem>>(emptyList())
     val zooAnimalDataList: SharedFlow<List<AnimalResultItem>> = _zooAnimalDataList.asStateFlow()
 
-    private val _zooAnimalsData3 = MutableStateFlow(ZooResultItem())
-    val zooAnimalsData3: SharedFlow<ZooResultItem> = _zooAnimalsData3.asStateFlow()
-
     init {
         getData1()
     }
@@ -39,17 +35,5 @@ class GalleryViewModel @Inject constructor(
         titleCh: String,
     ) {
         navController.currentBackStackEntry?.savedStateHandle?.set("titleCh", titleCh)
-    }
-
-    fun getArgs(navController: NavController){
-        val data = ZooResultItem(
-            eName = navController.previousBackStackEntry?.savedStateHandle?.get("title"),
-            ePicUrl = navController.previousBackStackEntry?.savedStateHandle?.get("imgUrl"),
-            eInfo = navController.previousBackStackEntry?.savedStateHandle?.get("libraryContent"),
-            eCategory = navController.previousBackStackEntry?.savedStateHandle?.get("category"),
-            eMemo = navController.previousBackStackEntry?.savedStateHandle?.get("memo"),
-            eUrl = navController.previousBackStackEntry?.savedStateHandle?.get("eUrl"),
-        )
-        _zooAnimalsData3.tryEmit(data)
     }
 }

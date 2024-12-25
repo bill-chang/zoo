@@ -1,7 +1,6 @@
 package com.example.myapplicationtest.ui.gallery
 
 import Data.AnimalResultItem
-import Data.ZooResultItem
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,7 +24,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,8 +46,8 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.imageLoader
@@ -69,18 +67,16 @@ class GalleryFragment : Fragment() {
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val binding get() = _binding!!
+//    private val binding get() = _binding!!
     private val galleryViewModel by viewModels<GalleryViewModel>()
-//    private val GalleryFragmentArgs by navArgs()
+    private val galleryArgs by navArgs<GalleryFragmentArgs>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        // 要處理第一個動物園葉面帶過來的資料
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
-//        val root: View = binding.root
 
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -89,21 +85,23 @@ class GalleryFragment : Fragment() {
             setContent {
                 LibraryMainView(
                     viewModel = galleryViewModel,
-                    navController = controller
-                ) { it ->
+//                    navController = controller,
+                    galleryFragmentArgs = galleryArgs,
+                ) {
+                    val action = GalleryFragmentDirections.toSlide(
+                        titleCh = it.aNameCh.orEmpty()
+                    )
                     galleryViewModel.saveArgs(
                         controller,
                         titleCh = it.aNameCh.orEmpty(),
                     )
-                    controller.navigate(R.id.nav_slideshow)
+//                    想研究一下如何用code寫action, argument
+//                    controller.navigate(R.id.nav_slideshow)
+                    controller.navigate(action)
+
                 }
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
 
@@ -111,20 +109,16 @@ class GalleryFragment : Fragment() {
 fun LibraryMainView(
     context: Context = LocalContext.current,
     viewModel: GalleryViewModel,
-    navController: NavController,
+//    navController: NavController,
+    galleryFragmentArgs: GalleryFragmentArgs,
     onClickListener: (AnimalResultItem) -> Unit,
 ) {
     val libraryData by viewModel.zooAnimalDataList.collectAsStateWithLifecycle(emptyList())
-    val animalData3 by viewModel.zooAnimalsData3.collectAsStateWithLifecycle(ZooResultItem())
 
     val imageLoader = context.imageLoader.newBuilder()
         .logger(DebugLogger())
         .memoryCache { MemoryCache.Builder(context).maxSizePercent(0.1).build() }
         .build()
-
-    LaunchedEffect(libraryData) {
-        viewModel.getArgs(navController)
-    }
 
     Column {
         LibraryIntroduceView(
@@ -132,7 +126,7 @@ fun LibraryMainView(
                 .fillMaxWidth()
                 .height(400.dp),
             context = context,
-            mainLibraryData = animalData3,
+            args = galleryFragmentArgs,
             imageLoader = imageLoader,
         )
         HorizontalDivider(thickness = 10.dp, color = Color.LightGray)
@@ -166,6 +160,7 @@ fun AnimalIntroduceColumn(
             onClickListener = onClickListener
         )
     }
+//    感覺可以從home使用 compose的 NavHost()帶下來 再研究一下
 //    NavHost()
 }
 
@@ -269,23 +264,23 @@ fun ViewTitle(modifier: Modifier = Modifier) {
 fun LibraryIntroduceView(
     modifier: Modifier = Modifier,
     context: Context,
-    mainLibraryData: ZooResultItem,
+    args: GalleryFragmentArgs,
     imageLoader: ImageLoader,
 ) {
     Column(modifier = modifier) {
         LibraryImage(
             context = context,
-            mainLibraryData = mainLibraryData,
-            imageLoader = imageLoader
+            args = args,
+            imageLoader = imageLoader,
         )
-        LibraryDetailInfo(mainLibraryData = mainLibraryData)
+        LibraryDetailInfo(args = args)
     }
 }
 
 @Composable
 fun LibraryImage(
     context: Context,
-    mainLibraryData: ZooResultItem,
+    args: GalleryFragmentArgs,
     imageLoader: ImageLoader,
 ) {
     AsyncImage(
@@ -293,7 +288,7 @@ fun LibraryImage(
             .fillMaxWidth()
             .height(200.dp),
         model = ImageRequest.Builder(context)
-            .data("${mainLibraryData.ePicUrl}")
+            .data(args.imgUrl)
             .setHeader("User-Agent", "Mozilla/5.0")
             .crossfade(true)
             .build(),
@@ -308,46 +303,47 @@ fun LibraryImage(
 @Composable
 fun LibraryDetailInfo(
     modifier: Modifier = Modifier,
-    mainLibraryData: ZooResultItem,
+    args: GalleryFragmentArgs,
 ) {
     Column(modifier = modifier.padding(5.dp)) {
         Text(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp),
-            text = mainLibraryData.eInfo.orEmpty(),
+            text = args.libraryContent,
             overflow = TextOverflow.Ellipsis,
             style = TextStyle(fontSize = 20.sp)
         )
-        BottomLibraryInfo(mainLibraryData = mainLibraryData)
-    }
-
-
-}
-
-@Composable
-fun BottomLibraryInfo(mainLibraryData: ZooResultItem) {
-    Column {
-        TopInfoLine(mainLibraryData = mainLibraryData)
-        BottomInfoLine(
-            leftContent = mainLibraryData.eCategory ?: "無",
-            rightUrl = mainLibraryData.eUrl ?: ""
+        BottomLibraryInfo(
+            args = args
         )
     }
 }
 
 @Composable
-fun TopInfoLine(mainLibraryData: ZooResultItem) {
-    mainLibraryData.eMemo?.ifBlank { "無" }?.let {
+fun BottomLibraryInfo(
+    args: GalleryFragmentArgs
+) {
+    Column {
+        TopInfoLine(args = args)
+        BottomInfoLine(
+            leftContent = args.category.ifBlank { "無" },
+            rightUrl = args.eUrl.ifBlank { "無" }
+        )
+    }
+}
+
+@Composable
+fun TopInfoLine(
+    args: GalleryFragmentArgs
+) {
         MiddleTextView(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp),
-            content = it,
+            content = args.memo.ifBlank {"無"},
             alignment = Alignment.CenterStart
         )
-    }
-
 }
 
 @Composable

@@ -36,6 +36,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.imageLoader
@@ -44,6 +45,7 @@ import coil.request.ImageRequest
 import coil.util.DebugLogger
 import com.example.myapplicationtest.R
 import com.example.myapplicationtest.databinding.FragmentSlideshowBinding
+import com.example.myapplicationtest.ui.gallery.GalleryFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 import viewModel.SlideshowViewModel
 
@@ -56,6 +58,7 @@ class SlideshowFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private val slideshowViewModel by viewModels<SlideshowViewModel>()
+    private val slidesArgs by navArgs<SlideshowFragmentArgs>()
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -3,7 +3,6 @@ package viewModel
 import Data.ZooResultItem
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,22 +28,5 @@ class HomeViewModel @Inject constructor(
             val libraryData = repository.networkCall().result?.results.orEmpty()
             _zooLibraryData.tryEmit(libraryData)
         }
-    }
-
-    fun saveArgs(
-        navController: NavController,
-        title: String = "",
-        imgUrl: String = "",
-        libraryContent: String = "",
-        memo: String = "",
-        category: String = "",
-        eUrl: String = "",
-    ) {
-        navController.currentBackStackEntry?.savedStateHandle?.set("title", title)
-        navController.currentBackStackEntry?.savedStateHandle?.set("imgUrl", imgUrl)
-        navController.currentBackStackEntry?.savedStateHandle?.set("libraryContent", libraryContent)
-        navController.currentBackStackEntry?.savedStateHandle?.set("memo", memo)
-        navController.currentBackStackEntry?.savedStateHandle?.set("category", category)
-        navController.currentBackStackEntry?.savedStateHandle?.set("eUrl", eUrl)
     }
 }

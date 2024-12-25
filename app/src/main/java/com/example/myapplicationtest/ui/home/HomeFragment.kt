@@ -3,9 +3,12 @@ package com.example.myapplicationtest.ui.home
 import Data.ZooResultItem
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -43,6 +46,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.navArgument
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
 import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.memory.MemoryCache
@@ -50,6 +56,7 @@ import coil.request.ImageRequest
 import coil.util.DebugLogger
 import com.example.myapplicationtest.R
 import com.example.myapplicationtest.databinding.FragmentHomeBinding
+import com.example.myapplicationtest.ui.gallery.GalleryFragment
 import dagger.hilt.android.AndroidEntryPoint
 import viewModel.HomeViewModel
 
@@ -60,7 +67,6 @@ class HomeFragment : Fragment() {
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val binding get() = _binding!!
     private val homeViewModel by viewModels<HomeViewModel>()
 
     override fun onCreateView(
@@ -69,6 +75,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
@@ -82,14 +89,11 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
 }
 
 @Composable
@@ -97,9 +101,8 @@ fun ZooLibraryHomeView(modifier: Modifier = Modifier, homeViewModel: HomeViewMod
     val libraryData by homeViewModel.zooLibraryData.collectAsStateWithLifecycle(emptyList())
     LazyColumn(modifier = modifier) {
         itemsIndexed(items = libraryData){ index, item ->
-            ZooLibraryItem(item){
-                homeViewModel.saveArgs(
-                    navController,
+            ZooLibraryItem(item) {
+                val action = HomeFragmentDirections.toGallery(
                     title = item.eName.orEmpty(),
                     imgUrl = item.ePicUrl.orEmpty(),
                     libraryContent = item.eInfo.orEmpty(),
@@ -107,8 +110,12 @@ fun ZooLibraryHomeView(modifier: Modifier = Modifier, homeViewModel: HomeViewMod
                     category = item.eCategory.orEmpty(),
                     eUrl = item.eUrl.orEmpty()
                 )
-                navController.navigate(R.id.nav_gallery)
+
+//                navController.navigate(R.id.nav_gallery)
+
+                navController.navigate(action)
             }
+
             if (index != libraryData.lastIndex){
                 HorizontalDivider(thickness = 2.dp, color = Color.Black)
             }
