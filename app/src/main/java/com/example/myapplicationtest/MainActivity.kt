@@ -65,9 +65,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
 
         return super.onCreateView(name, context, attrs)
-    }
-
-    override fun onResume() {
         findNavController(R.id.nav_host_fragment_content_main).addOnDestinationChangedListener { controller, destination, arguments ->
             when (destination.id) {
                 R.id.nav_home -> {}
@@ -76,14 +73,17 @@ class MainActivity : AppCompatActivity() {
                 else -> {}
             }
         }
+    }
+
+    override fun onResume() {
+
         super.onResume()
     }
 
-    fun changeAppBar(title:String, icon: Drawable? = null){
+    private fun changeAppBar(title:String, icon: Drawable? = null){
 //        binding.appBarMain.toolbar.setBackgroundColor(Color.White.toArgb())
 //        binding.appBarMain.toolbar.setTitleTextColor(Color.Black.toArgb())
         binding.appBarMain.toolbar.title = title
-        Log.d("96_789", "changeAppBar: $title")
 //        binding.appBarMain.toolbar.navigationIcon = getDrawable(R.drawable.ic_menu_gallery)
     }
 }
