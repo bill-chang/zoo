@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.example.myapplicationtest.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/toGallery"
+            app:destination="@id/nav_gallery"/>
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/nav_gallery"
+        android:name="com.example.myapplicationtest.ui.gallery.GalleryFragment"
+        android:label="@string/menu_gallery"
+        tools:layout="@layout/fragment_gallery" >
+        <action
+            android:id="@+id/toSlide"
+            app:destination="@id/nav_slideshow"/>
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="imgUrl"
+            app:argType="string" />
+        <argument
+            android:name="libraryContent"
+            app:argType="string" />
+        <argument
+            android:name="category"
+            app:argType="string" />
+        <argument
+            android:name="memo"
+            app:argType="string" />
+        <argument
+            android:name="eUrl"
+            app:argType="string" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/nav_slideshow"
+        android:name="com.example.myapplicationtest.ui.slideshow.SlideshowFragment"
+        android:label="@string/menu_slideshow"
+        tools:layout="@layout/fragment_slideshow" >
+        <argument
+            android:name="titleCh"
+            app:argType="string"
+            />
+    </fragment>
+</navigation>
