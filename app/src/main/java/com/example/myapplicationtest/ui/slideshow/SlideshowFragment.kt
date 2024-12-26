@@ -1,6 +1,5 @@
 package com.example.myapplicationtest.ui.slideshow
 
-import Data.AnimalResultItem
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,8 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -33,9 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -45,7 +39,6 @@ import coil.request.ImageRequest
 import coil.util.DebugLogger
 import com.example.myapplicationtest.R
 import com.example.myapplicationtest.databinding.FragmentSlideshowBinding
-import com.example.myapplicationtest.ui.gallery.GalleryFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 import viewModel.SlideshowViewModel
 
@@ -75,19 +68,12 @@ class SlideshowFragment : Fragment() {
                     .memoryCache { MemoryCache.Builder(context).maxSizePercent(0.1).build() }
                     .build()
                 AnimalIntroduceDetail(
-                    imgUrl = "",
                     imageLoader = imageLoader,
                     viewModel = slideshowViewModel,
-                    navController = requireActivity().findNavController(this@SlideshowFragment.id)
+                    args = slidesArgs,
                 )
             }
         }
-
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
 
@@ -95,18 +81,10 @@ class SlideshowFragment : Fragment() {
 @Composable()
 fun AnimalIntroduceDetail(
     context: Context = LocalContext.current,
-    imgUrl: String,
     imageLoader: ImageLoader,
     viewModel: SlideshowViewModel,
-    navController: NavController,
+    args: SlideshowFragmentArgs,
 ) {
-    val libraryData by viewModel.animalDataList.collectAsStateWithLifecycle(AnimalResultItem())
-    val libraryData1 by viewModel.animalDetailItem.collectAsStateWithLifecycle(AnimalResultItem())
-    LaunchedEffect(libraryData) {
-        if (libraryData != AnimalResultItem()){
-            viewModel.getPassData(navController)
-        }
-    }
 
     Column {
         AsyncImage(
@@ -115,7 +93,7 @@ fun AnimalIntroduceDetail(
                 .height(300.dp)
                 .background(Color.Blue),
             model = ImageRequest.Builder(context)
-                .data(imgUrl)
+                .data(args.imgUrl)
                 .setHeader("User-Agent", "Mozilla/5.0")
                 .crossfade(true)
                 .build(),
@@ -125,13 +103,13 @@ fun AnimalIntroduceDetail(
             placeholder = painterResource(R.drawable.ic_menu_gallery),
             error = painterResource(R.drawable.ic_launcher_foreground),
         )
-    AnimalDetailContent(libraryData1 = libraryData1,)
+    AnimalDetailContent(args = args)
     }
 }
 
 @Composable
 fun AnimalDetailContent(
-    libraryData1: AnimalResultItem,
+    args: SlideshowFragmentArgs
 ) {
     Column (
         modifier = Modifier
@@ -141,13 +119,13 @@ fun AnimalDetailContent(
     ){
         Text(
             modifier = Modifier.wrapContentSize(),
-            text =  libraryData1.aNameCh.orEmpty(),
+            text =  args.titleCh.ifBlank { "無" },
             overflow = TextOverflow.Ellipsis,
             style = TextStyle(fontSize = 20.sp)
         )
         Text(
             modifier = Modifier.wrapContentSize(),
-            text =  libraryData1.aNameEn.orEmpty(),
+            text =  args.aNameEn.ifBlank { "無" },
             overflow = TextOverflow.Ellipsis,
             style = TextStyle(fontSize = 20.sp)
         )
@@ -160,7 +138,7 @@ fun AnimalDetailContent(
         )
         Text(
             modifier = Modifier.wrapContentSize(),
-            text = libraryData1.aAlsoKnown.orEmpty(),
+            text = args.aAlsoKnown.ifBlank { "無" },
             overflow = TextOverflow.Ellipsis,
             style = TextStyle(fontSize = 20.sp)
         )
@@ -173,7 +151,7 @@ fun AnimalDetailContent(
         )
         Text(
             modifier = Modifier.wrapContentSize(),
-            text = libraryData1.aDistribution.orEmpty(),
+            text = args.aDistribution.ifBlank { "無" },
             overflow = TextOverflow.Clip,
             style = TextStyle(fontSize = 20.sp)
         )
@@ -186,7 +164,7 @@ fun AnimalDetailContent(
         )
         Text(
             modifier = Modifier.wrapContentSize(),
-            text = libraryData1.aFeature.orEmpty(),
+            text = args.aFeature.ifBlank { "無" },
             overflow = TextOverflow.Clip,
             style = TextStyle(fontSize = 20.sp)
         )
@@ -199,14 +177,14 @@ fun AnimalDetailContent(
         )
         Text(
             modifier = Modifier.wrapContentSize(),
-            text = libraryData1.aBehavior.orEmpty(),
+            text = args.aBehavior.ifBlank { "無" },
             overflow = TextOverflow.Clip,
             style = TextStyle(fontSize = 20.sp)
         )
         Spacer(Modifier.height(20.dp))
         Text(
             modifier = Modifier.wrapContentSize(),
-            text = "最後更新${libraryData1.aUpdate?.ifBlank { "無" }}",
+            text = "最後更新${args.aUpdate.ifBlank { "無" }}",
             overflow = TextOverflow.Clip,
             style = TextStyle(fontSize = 20.sp)
         )

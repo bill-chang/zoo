@@ -3,12 +3,9 @@ package com.example.myapplicationtest.ui.home
 import Data.ZooResultItem
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -46,17 +43,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.navArgument
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
+import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.imageLoader
-import coil.memory.MemoryCache
 import coil.request.ImageRequest
-import coil.util.DebugLogger
 import com.example.myapplicationtest.R
 import com.example.myapplicationtest.databinding.FragmentHomeBinding
-import com.example.myapplicationtest.ui.gallery.GalleryFragment
 import dagger.hilt.android.AndroidEntryPoint
 import viewModel.HomeViewModel
 
@@ -83,7 +74,7 @@ class HomeFragment : Fragment() {
                     modifier = Modifier
                         .fillMaxSize(),
                     homeViewModel = homeViewModel,
-                    navController = requireActivity().findNavController(this@HomeFragment.id)
+                    navController = requireActivity().findNavController(this@HomeFragment.id),
                 )
             }
         }
@@ -93,15 +84,22 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }
 
 @Composable
-fun ZooLibraryHomeView(modifier: Modifier = Modifier, homeViewModel: HomeViewModel, navController: NavController) {
+fun ZooLibraryHomeView(
+    modifier: Modifier = Modifier,
+    homeViewModel: HomeViewModel,
+    navController: NavController,
+) {
     val libraryData by homeViewModel.zooLibraryData.collectAsStateWithLifecycle(emptyList())
+    val imageLoader = homeViewModel.imageLoader
     LazyColumn(modifier = modifier) {
         itemsIndexed(items = libraryData){ index, item ->
-            ZooLibraryItem(item) {
+            ZooLibraryItem(
+                item = item,
+                imageLoader = imageLoader
+            ) {
                 val action = HomeFragmentDirections.toGallery(
                     title = item.eName.orEmpty(),
                     imgUrl = item.ePicUrl.orEmpty(),
@@ -128,6 +126,7 @@ fun ZooLibraryHomeView(modifier: Modifier = Modifier, homeViewModel: HomeViewMod
 fun ZooLibraryItem(
     item: ZooResultItem,
     context: Context = LocalContext.current,
+    imageLoader: ImageLoader,
     onClickEvent: (String) -> Unit,
 ) {
     Row(
@@ -137,10 +136,10 @@ fun ZooLibraryItem(
             .padding(vertical = 10.dp, horizontal = 5.dp)
             .combinedClickable(onClick = { onClickEvent(item.eName.orEmpty()) }),
     ){
-        val imageLoader = context.imageLoader.newBuilder()
-            .logger(DebugLogger())
-            .memoryCache { MemoryCache.Builder(context).maxSizePercent(0.1).build() }
-            .build()
+//        val imageLoader = context.imageLoader.newBuilder()
+//            .logger(DebugLogger())
+//            .memoryCache { MemoryCache.Builder(context).maxSizePercent(0.1).build() }
+//            .build()
 
         AsyncImage(
             modifier = Modifier

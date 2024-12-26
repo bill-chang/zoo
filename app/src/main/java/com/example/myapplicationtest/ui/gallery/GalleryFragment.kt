@@ -50,10 +50,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.imageLoader
-import coil.memory.MemoryCache
 import coil.request.ImageRequest
-import coil.util.DebugLogger
 import com.example.myapplicationtest.R
 import com.example.myapplicationtest.databinding.FragmentGalleryBinding
 import com.example.myapplicationtest.ui.home.ItemEndView
@@ -89,11 +86,14 @@ class GalleryFragment : Fragment() {
                     galleryFragmentArgs = galleryArgs,
                 ) {
                     val action = GalleryFragmentDirections.toSlide(
-                        titleCh = it.aNameCh.orEmpty()
-                    )
-                    galleryViewModel.saveArgs(
-                        controller,
                         titleCh = it.aNameCh.orEmpty(),
+                        aNameEn = it.aNameEn.orEmpty(),
+                        aFeature = it.aFeature.orEmpty(),
+                        aUpdate = it.aUpdate.orEmpty(),
+                        aAlsoKnown = it.aAlsoKnown.orEmpty(),
+                        aBehavior = it.aBehavior.orEmpty(),
+                        aDistribution = it.aDistribution.orEmpty(),
+                        imgUrl = it.aPic01Url.orEmpty(),
                     )
 //                    想研究一下如何用code寫action, argument
 //                    controller.navigate(R.id.nav_slideshow)
@@ -114,11 +114,12 @@ fun LibraryMainView(
     onClickListener: (AnimalResultItem) -> Unit,
 ) {
     val libraryData by viewModel.zooAnimalDataList.collectAsStateWithLifecycle(emptyList())
+    val imageLoader = viewModel.imageLoader
 
-    val imageLoader = context.imageLoader.newBuilder()
-        .logger(DebugLogger())
-        .memoryCache { MemoryCache.Builder(context).maxSizePercent(0.1).build() }
-        .build()
+//    val imageLoader = context.imageLoader.newBuilder()
+//        .logger(DebugLogger())
+//        .memoryCache { MemoryCache.Builder(context).maxSizePercent(0.1).build() }
+//        .build()
 
     Column {
         LibraryIntroduceView(
@@ -314,9 +315,7 @@ fun LibraryDetailInfo(
             overflow = TextOverflow.Ellipsis,
             style = TextStyle(fontSize = 20.sp)
         )
-        BottomLibraryInfo(
-            args = args
-        )
+        BottomLibraryInfo(args = args)
     }
 }
 
@@ -334,16 +333,14 @@ fun BottomLibraryInfo(
 }
 
 @Composable
-fun TopInfoLine(
-    args: GalleryFragmentArgs
-) {
-        MiddleTextView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp),
-            content = args.memo.ifBlank {"無"},
-            alignment = Alignment.CenterStart
-        )
+fun TopInfoLine(args: GalleryFragmentArgs) {
+    MiddleTextView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp),
+        content = args.memo.ifBlank { "無" },
+        alignment = Alignment.CenterStart
+    )
 }
 
 @Composable
