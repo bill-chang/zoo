@@ -52,7 +52,28 @@
         tools:layout="@layout/fragment_slideshow" >
         <argument
             android:name="titleCh"
-            app:argType="string"
-            />
+            app:argType="string" />
+        <argument
+            android:name="imgUrl"
+            app:argType="string" />
+        <argument
+            android:name="aNameEn"
+            app:argType="string" />
+        <argument
+            android:name="aAlsoKnown"
+            app:argType="string" />
+        <argument
+            android:name="aDistribution"
+            app:argType="string" />
+        <argument
+            android:name="aFeature"
+            app:argType="string" />
+        <argument
+            android:name="aBehavior"
+            app:argType="string" />
+        <argument
+            android:name="aUpdate"
+            app:argType="string" />
+
     </fragment>
 </navigation>

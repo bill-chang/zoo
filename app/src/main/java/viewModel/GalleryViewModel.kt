@@ -1,9 +1,9 @@
 package viewModel
 
 import Data.AnimalResultItem
+import Data.CallBackResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -24,16 +24,16 @@ class GalleryViewModel @Inject constructor(
         getData1()
     }
 
+    val imageLoader = repository.getImageLoader()
+
     private fun getData1(){
         viewModelScope.launch {
-            _zooAnimalDataList.tryEmit(repository.getZooData().result?.results.orEmpty())
+            val result = repository.getZooData()
+            if (result is CallBackResource.Success){
+                _zooAnimalDataList.tryEmit(result.data.result?.results?: emptyList())
+            }else{
+                _zooAnimalDataList.tryEmit(emptyList())
+            }
         }
-    }
-
-    fun saveArgs(
-        navController: NavController,
-        titleCh: String,
-    ) {
-        navController.currentBackStackEntry?.savedStateHandle?.set("titleCh", titleCh)
     }
 }
