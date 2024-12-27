@@ -1,6 +1,5 @@
 package com.example.myapplicationtest
 
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -32,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(setOf(), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_home), drawerLayout)
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -44,23 +43,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        findNavController(R.id.nav_host_fragment_content_main).addOnDestinationChangedListener { controller, destination, arguments ->
+        findNavController(R.id.nav_host_fragment_content_main).addOnDestinationChangedListener { _, destination, arguments ->
             when (destination.id) {
                 R.id.nav_home -> {}
-                R.id.nav_gallery -> { changeAppBar(title = arguments?.getString("title").orEmpty())}
-                R.id.nav_slideshow -> { changeAppBar(title = arguments?.getString("titleCh").orEmpty())}
+                R.id.nav_gallery -> { changeBarTitle(title = arguments?.getString("title").orEmpty())}
+                R.id.nav_slideshow -> { changeBarTitle(title = arguments?.getString("titleCh").orEmpty())}
                 else -> {}
             }
         }
         super.onResume()
     }
 
-    private fun changeAppBar(title:String, icon: Drawable? = null){
+    private fun changeBarTitle(title:String){
         binding.appBarMain.toolbar.title = title
-//      再想想怎麼換toolbar的按件
-//        binding.appBarMain.toolbar
-//        binding.appBarMain.toolbar.setBackgroundColor(Color.White.toArgb())
-//        binding.appBarMain.toolbar.setTitleTextColor(Color.Black.toArgb())
-//        binding.appBarMain.toolbar.navigationIcon = getDrawable(R.drawable.ic_menu_gallery)
     }
 }
